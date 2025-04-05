@@ -14,6 +14,7 @@ class Tasks extends Model
         'name',
         'list_id',
         'status',
+        'time'
     ];
 
     protected static function boot(): void

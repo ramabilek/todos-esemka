@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');$table->foreignId('list_id')->constrained('list');
             $table->enum('status', ['completed', 'in progress'])->default('in progress');
+            $table->time('time');
             $table->timestamps();
         });
     }

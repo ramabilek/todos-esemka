@@ -8,29 +8,25 @@ use Illuminate\Http\Request;
 
 class TasksController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(): JsonResponse
     {
-        return Tasks::all();
+        return response()->json(Tasks::all());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create(Request $request): ?JsonResponse
+    public function create(Request $request): JsonResponse
     {
         $validatedData = $request->validate([
             'name' => 'required|string',
-            'list_id' => 'exists:list,id',
+            'list_id' => 'required|exists:list,id',
+            'time' => 'required|date_format:H:i',
+            'status' => 'in:completed,in progress',
         ]);
 
-        $tasks = Tasks::create($validatedData);
+        $task = Tasks::create($validatedData);
 
         return response()->json([
             'message' => 'Task created successfully!',
-            'tasks' => $tasks
+            'task' => $task
         ], 201);
     }
 
@@ -45,6 +41,8 @@ class TasksController extends Controller
         $request->validate([
             'name' => 'string|nullable',
             'list_id' => 'nullable|exists:list,id',
+            'time' => 'date_format:H:i',
+            'status' => 'in:completed,in progress',
         ]);
 
         $task->update(['status' => $request->status]);
@@ -52,15 +50,17 @@ class TasksController extends Controller
         return response()->json(['message' => 'Task status updated successfully', 'task' => $task]);
     }
 
+
     public function delete($id): JsonResponse
     {
-        $list = Tasks::find($id);
+        $task = Tasks::find($id);
 
-        if (!$list) {
+        if (!$task) {
             return response()->json(['message' => 'Task not found'], 404);
         }
 
-        $list->delete();
+        $task->delete();
+
         return response()->json(['message' => 'Task deleted successfully']);
     }
 }
